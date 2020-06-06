@@ -33,7 +33,7 @@ public class AdminServer {
 
             this.serverThread = new Thread ( () -> {
                 while ( true ) {
-                    System.out.println("Waiting for clients to connect.");
+                    System.out.println("Waiting for clients to connect...");
                     try {
                         Socket socket = this.server.accept();
                         System.out.println("Administration_server connected from " + socket.getInetAddress().getHostAddress() + ".");

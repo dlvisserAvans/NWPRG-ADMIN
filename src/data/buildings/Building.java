@@ -1,6 +1,7 @@
 package data.buildings;
 
 import java.io.Serializable;
+import java.util.PriorityQueue;
 
 public abstract class Building implements Serializable {
 
@@ -8,12 +9,14 @@ public abstract class Building implements Serializable {
     String Adres;
     String City;
     BuildingType buildingType;
+    int Price;
 
-    public Building(String zip, String adres, String city, BuildingType buildingType) {
+    public Building(String zip, String adres, String city, BuildingType buildingType, int price) {
         Zip = zip;
         Adres = adres;
         City = city;
         this.buildingType = buildingType;
+        Price = price;
     }
 
     public String getZip() {
@@ -46,5 +49,17 @@ public abstract class Building implements Serializable {
 
     public void setBuildingType(BuildingType buildingType) {
         this.buildingType = buildingType;
+    }
+
+    public int getPrice() {
+        return Price;
+    }
+
+    public void setPrice(int price) {
+        this.Price = price;
+    }
+
+    public String toString() {
+        return "Building: " + buildingType + ", " + Zip + ", " + Adres + ", " + City + ", " + Price;
     }
 }

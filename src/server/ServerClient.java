@@ -1,12 +1,16 @@
 package server;
 
 import cmdGUI.CMDGUI;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import data.DataBase;
+import data.buildings.Building;
+import data.buildings.BuildingType;
 import data.user.User;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.FormatFlagsConversionMismatchException;
 
 public class ServerClient implements Runnable {
 
@@ -76,25 +80,82 @@ public class ServerClient implements Runnable {
                     User user = (User) objectInputStream.readObject();
                     dataBase.getUsers().add(user);
                     System.out.println("User: " + user.getLoginname() + " was added by: " + this.username);
-                    menuOption = dataInputStream.readUTF();
                 }
                 if (menuOption.equals(cmdgui.getMenuItems().get(1).getMenuName())){//Option 2. UserDel
                     dataOutputStream.writeUTF("Which user do you want to delete? Tip: first use command 'UserShow'");
                     String user = dataInputStream.readUTF();
+                    User deleteUser = null;
+                    boolean userFound = false;
                     for (User user1 : dataBase.getUsers()){
-                        if (user1.getLoginname().equals(user));
-                        dataBase.getUsers().remove(user1);
+                        if (user1.getLoginname().equals(user)){
+                            deleteUser = user1;
+                            userFound = true;
+                        }
                     }
-                    dataOutputStream.writeUTF("User: " + user + " Deleted by: " + this.username);
+                    if (userFound){
+                        dataBase.getUsers().remove(deleteUser);
+                        String response = "User: " + user + " Deleted by: " + this.username;
+                        dataOutputStream.writeUTF(response);
+                        System.out.println(this.username + " deleted " + deleteUser.getLoginname() + " (" + deleteUser + ")");
+                    }
                 }
                 if (menuOption.equals(cmdgui.getMenuItems().get(2).getMenuName())){ //Option 3. UserShow
                     System.out.println("Sending userdata from database to: " + this.username);
                     ArrayList<User> userArrayList = dataBase.getUsers();
-                    objectOutputStream.writeObject(userArrayList);
+                    dataOutputStream.writeUTF(userArrayList.size() + ""); //fantastic idea of JKB
+                    for (User user : userArrayList){
+                        objectOutputStream.writeObject(user);
+                    }
+                    System.out.println("send users");
+                }
+                if (menuOption.equals(cmdgui.getMenuItems().get(3).getMenuName())){ //Option 4. BuildingAdd
+                    String buildingType = dataInputStream.readUTF();
+                    String zipcode = dataInputStream.readUTF();
+                    String address = dataInputStream.readUTF();
+                    String city = dataInputStream.readUTF();
+                    int price = Integer.parseInt(dataInputStream.readUTF());
+                    System.out.println(buildingType + " - " + zipcode + " - " + address + " - " + city);
+
+                    BuildingType type = null;
+                    if (buildingType.equals("house")){
+                        type = BuildingType.HOUSE;
+                    } else if (buildingType.equals("condo")){
+                        type = BuildingType.CONDO;
+                    } else if (buildingType.equals("apartment")){
+                        type = BuildingType.APARTMENT;
+                    }
+                    dataBase.addNewBuilding(zipcode, address, city, type, price);
+                    dataOutputStream.writeUTF(buildingType + " added with address '" + address + "' with value " + price);
+                }
+                if (menuOption.equals(cmdgui.getMenuItems().get(4).getMenuName())){//Option 5. BuildingDel
+                    dataOutputStream.writeUTF("What is the address of the building you want to delete? ");
+                    String address = dataInputStream.readUTF();
+
+                    Building deleteBuiling = null;
+                    boolean buildingFound = false;
+                    for (Building b : dataBase.getBuildings()){
+                        if (b.getAdres().equals(address)){
+                            deleteBuiling = b;
+                            buildingFound = true;
+                        }
+                    }
+                    if (buildingFound){
+                        dataBase.getBuildings().remove(deleteBuiling);
+                        String response = "User: Building at address " + address + " deleted by " + this.username;
+                        dataOutputStream.writeUTF(response);
+                    }
+                }
+                if (menuOption.equals(cmdgui.getMenuItems().get(5).getMenuName())){ //Option 5. BuildingrShow
+                    System.out.println("Sending userdata from database to: " + this.username);
+                    ArrayList<Building> buildingArrayList = dataBase.getBuildings();
+                    dataOutputStream.writeUTF(buildingArrayList.size() + ""); //fantastic idea of JKB
+                    for (Building building : buildingArrayList){
+                        objectOutputStream.writeObject(building);
+                    }
+                    System.out.println("send buildings");
                 }
                 objectOutputStream.flush();
                 dataOutputStream.flush();
-//                menuOption = dataInputStream.readUTF();
             }
 
             this.socket.close();

@@ -17,13 +17,13 @@ public class DataBase {
 
     public ArrayList<Building> setupBuildingList(){
         ArrayList<Building> buildings = new ArrayList<>();
-        buildings.add(new House("21601","4483 Woodhill Avenue", "Easton"));
-        buildings.add(new House("44646","3878 Rainbow Drive", "Perry Heights"));
-        buildings.add(new Condo("77002","3424 Monroe Street", "Houston"));
-        buildings.add(new Condo("48933","152 Ben Street", "Lansing"));
-        buildings.add(new Apartment("49779","5012 Hart Ridge Road", "Rogers City"));
-        buildings.add(new Apartment("75159","4164  Wilson Avenue", "Seagoville"));
-        buildings.add(new Apartment("48075","4985  Mahlon Street", "Southfield"));
+        buildings.add(new House("21601","4483 Woodhill Avenue", "Easton", 100000));
+        buildings.add(new House("44646","3878 Rainbow Drive", "Perry Heights", 200000));
+        buildings.add(new Condo("77002","3424 Monroe Street", "Houston", 300000));
+        buildings.add(new Condo("48933","152 Ben Street", "Lansing", 400000));
+        buildings.add(new Apartment("49779","5012 Hart Ridge Road", "Rogers City", 500000));
+        buildings.add(new Apartment("75159","4164  Wilson Avenue", "Seagoville", 600000));
+        buildings.add(new Apartment("48075","4985  Mahlon Street", "Southfield", 700000));
 
         return buildings;
     }
@@ -31,7 +31,8 @@ public class DataBase {
     public ArrayList<User> setupUserList(){
         ArrayList<User> users = new ArrayList<>();
         users.add(new User("Dave","1234"));
-        users.add(new User("JKB","1234"));
+        users.add(new User("JanKees","1234"));
+        users.add(new User("Hans", "1234"));
 
         return users;
     }
@@ -51,15 +52,15 @@ public class DataBase {
         this.users.add(new User(userName,password));
     }
 
-    public void addNewBuilding(String zipcode, String address, String City, BuildingType buildingType){
+    public void addNewBuilding(String zipcode, String address, String City, BuildingType buildingType, int price){
         if (buildingType.equals(BuildingType.HOUSE)){
-            this.buildings.add(new House(zipcode,address,City));
+            this.buildings.add(new House(zipcode,address,City, price));
         }
         if (buildingType.equals(BuildingType.APARTMENT)){
-            this.buildings.add(new Apartment(zipcode,address,City));
+            this.buildings.add(new Apartment(zipcode,address,City, price));
         }
         if (buildingType.equals(BuildingType.CONDO)){
-            this.buildings.add(new Condo(zipcode,address,City));
+            this.buildings.add(new Condo(zipcode,address,City, price));
         }
     }
 

@@ -2,6 +2,7 @@ package client;
 
 import cmdGUI.CMDGUI;
 import cmdGUI.MenuItem.MenuItem;
+import data.buildings.Building;
 import data.user.User;
 
 import java.io.*;
@@ -53,21 +54,21 @@ public class AdminClient {
                 System.out.println(dataInputStream.readUTF());
             }
 
-            new Thread ( () -> {
-                while ( true ) {
-                    try {
-                        System.out.println(dataInputStream.readUTF());
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
+//            new Thread ( () -> {
+//                while ( true ) {
+//                    try {
+//                        System.out.println(dataInputStream.readUTF());
+//
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }).start();
 
             //Step 2: Let the user choose a option.
             String menuOption = "";
             while ( !menuOption.equals("quit" )) {
-
+                System.out.println();
                     for (MenuItem menuItem : cmdgui.getMenuItems()) {
                         System.out.println(menuItem.getMenuName() + " - " + menuItem.getDescription());
                     }
@@ -83,8 +84,13 @@ public class AdminClient {
                     objectOutputStream.writeObject(new User(name,passcode));
                     objectOutputStream.flush();
                     dataOutputStream.flush();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                if (menuOption.equals(cmdgui.getMenuItems().get(1).getMenuName())){ //Option 2. UserDel
+                else if (menuOption.equals(cmdgui.getMenuItems().get(1).getMenuName())){ //Option 2. UserDel
                     dataOutputStream.writeUTF(menuOption); //Step 2.1
                     System.out.println(dataInputStream.readUTF());
                     String user = scanner.nextLine();
@@ -92,10 +98,21 @@ public class AdminClient {
                     System.out.println(dataInputStream.readUTF());
                     objectOutputStream.flush();
                     dataOutputStream.flush();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                if (menuOption.equals(cmdgui.getMenuItems().get(2).getMenuName())){ //Option 3. UserShow
+                else if (menuOption.equals(cmdgui.getMenuItems().get(2).getMenuName())){ //Option 3. UserShow
                     dataOutputStream.writeUTF(menuOption); //Step 2.1
-                    ArrayList<User> userArrayList = (ArrayList<User>) objectInputStream.readObject(); //TODO: invalid type code: 00 onderzoeken
+                    System.out.println("Waiting for the users...");
+                    ArrayList<User> userArrayList = new ArrayList<>();
+                    int amountOfUsers = Integer.parseInt(dataInputStream.readUTF());
+                    for (int i = 0; i < amountOfUsers; i++){
+                        userArrayList.add((User)objectInputStream.readObject());
+                    }
+
                     System.out.println("All the user accounts: ");
                     for (User user : userArrayList){
                         System.out.println(user.getLoginname());
@@ -103,26 +120,74 @@ public class AdminClient {
                     objectOutputStream.flush();
                     dataOutputStream.flush();
                 }
-//                MenuItem selectedMenuItem = null;
-//                while (selectedMenuItem==null) {
-//                    selectedMenuItem = cmdgui.getMenuItemByName(cmdgui.getMenuItems(), scanner.nextLine());
-//                    if (selectedMenuItem == null) {
-//                        System.out.println("Invalid command");
-//                    } else {
-//                        out.writeUTF(selectedMenuItem.toString());
-//                        selectedMenuItem.Action();
-//                    }
-//                }
+                else if (menuOption.equals(cmdgui.getMenuItems().get(3).getMenuName())){ //Option 4. BuildingAdd
+                    dataOutputStream.writeUTF(menuOption); //Step 2.1
+                    System.out.print("What buidlingtype do you want to add? house / condo / apartment ");
+                    String buildingType = scanner.nextLine();
+                    dataOutputStream.writeUTF(buildingType);
+                    System.out.print("What is the zipcode of the  " + buildingType + "? ");
+                    String zipcode = scanner.nextLine();
+                    dataOutputStream.writeUTF(zipcode);
+                    System.out.print("What is the address of the  " + buildingType + "? ");
+                    String address = scanner.nextLine();
+                    dataOutputStream.writeUTF(address);
+                    System.out.print("What is the city of the  " + buildingType + "? ");
+                    String city = scanner.nextLine();
+                    dataOutputStream.writeUTF(city);
+                    System.out.print("What is the value of the " + buildingType + "? " );
+                    String value = scanner.nextLine();
+                    dataOutputStream.writeUTF(value);
+                    System.out.println(dataInputStream.readUTF());
 
+                    objectOutputStream.flush();
+                    dataOutputStream.flush();
+                }
 
-                dataOutputStream.writeUTF(menuOption);
+                else if (menuOption.equals(cmdgui.getMenuItems().get(4).getMenuName())){ //Option 5. BuildingDel
+                    dataOutputStream.writeUTF(menuOption); //Step 2.1
+                    System.out.println(dataInputStream.readUTF());
+                    String address = scanner.nextLine();
+                    dataOutputStream.writeUTF(address);
+
+                    System.out.println(dataInputStream.readUTF());
+
+                    objectOutputStream.flush();
+                    dataOutputStream.flush();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                else if (menuOption.equals(cmdgui.getMenuItems().get(5).getMenuName())){ //Option 5. BuilldingShow
+                    dataOutputStream.writeUTF(menuOption); //Step 2.1
+                    System.out.println("Waiting for the buildings...");
+                    ArrayList<Building> buildingArrayList = new ArrayList<>();
+                    int amountOfBuildings = Integer.parseInt(dataInputStream.readUTF());
+                    for (int i = 0; i < amountOfBuildings; i++){
+                        buildingArrayList.add((Building) objectInputStream.readObject());
+                    }
+
+                    System.out.println("All the buildings: ");
+                    for (Building building : buildingArrayList){
+                        System.out.println(building.toString());
+                    }
+                    objectOutputStream.flush();
+                    dataOutputStream.flush();
+                } else {
+                    System.out.println("Invalid input!");
+                }
             }
 
             this.socket.close();
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Could not connect with the server on " + this.host + " with port " + this.port + ": " + e.getMessage());
             return false;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
         return true;
