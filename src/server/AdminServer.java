@@ -1,5 +1,9 @@
 package server;
 
+import data.DataBase;
+import data.buildings.Building;
+import data.buildings.House;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,6 +18,7 @@ public class AdminServer {
     private Thread serverThread;
     private ArrayList<ServerClient> clients;
     private ArrayList<Thread> threads;
+    private DataBase dataBase;
 
     public AdminServer ( int port ) {
         this.port = port;
@@ -24,15 +29,16 @@ public class AdminServer {
     public boolean start ( ) {
         try {
             this.server = new ServerSocket(port);
+            this.dataBase = new DataBase();
 
             this.serverThread = new Thread ( () -> {
                 while ( true ) {
                     System.out.println("Waiting for clients to connect.");
                     try {
                         Socket socket = this.server.accept();
-                        System.out.println("avans.ti.chat.client.Client connected from " + socket.getInetAddress().getHostAddress() + ".");
+                        System.out.println("Administration_server connected from " + socket.getInetAddress().getHostAddress() + ".");
 
-                        ServerClient client = new ServerClient(socket, this);
+                        ServerClient client = new ServerClient(socket, this, this.dataBase);
                         Thread threadClient = new Thread(client);
                         threadClient.start();
                         this.clients.add(client);
@@ -55,7 +61,7 @@ public class AdminServer {
             });
 
             this.serverThread.start();
-            System.out.println("avans.ti.chat.server.ChatServer is started and listening on port " + this.port);
+            System.out.println("Administartion_server is started and listening on port " + this.port);
 
         } catch (IOException e) {
             System.out.println("Could not connect: " + e.getMessage());
