@@ -2,8 +2,20 @@ package client;
 
 import cmdGUI.CMDGUI;
 import cmdGUI.MenuItem.MenuItem;
+import cmdGUI.MenuItem.MenuType;
 import data.buildings.Building;
 import data.user.User;
+import javafx.application.Application;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.Socket;
@@ -22,7 +34,17 @@ public class AdminClient {
     private DataOutputStream dataOutputStream;
     private CMDGUI cmdgui;
 
-    public AdminClient( String host, int port ) {
+//    private BorderPane mainLayout;
+//    private BorderPane menuLayout;
+//    @FXML  TextField TextFieldUserName = new TextField();
+//    @FXML  TextField TextFieldPassword = new TextField();
+//    @FXML  TextField TextFieldCommand = new TextField();
+//    @FXML  TextArea TextAreaOutput = new TextArea();
+//    @FXML  Label LabelCommands = new Label("Test");
+//    @FXML  Button ButtonSubmitCommand = new Button();
+//    @FXML  Button ButtonSubmitLogin = new Button();
+
+    public AdminClient( String host, int port) {
         this.host = host;
         this.port = port;
         this.cmdgui = new CMDGUI();
@@ -30,6 +52,9 @@ public class AdminClient {
 
     public boolean connect () {
         try {
+            this.host = "localhost";
+            this.port = 10000;
+            this.cmdgui = new CMDGUI();
             this.socket = new Socket(this.host, this.port);
 
             this.dataOutputStream = new DataOutputStream(this.socket.getOutputStream());
@@ -47,6 +72,7 @@ public class AdminClient {
             //Step 1: Log into server //TODO: Errors when user is not known.
             while (!loggedIn) {
                 System.out.print("What is your username: ");
+//                label.setText("What is your username: ");
                 dataOutputStream.writeUTF(scanner.nextLine());
                 System.out.print("What is your password: ");
                 dataOutputStream.writeUTF(scanner.nextLine());
@@ -193,9 +219,34 @@ public class AdminClient {
         return true;
     }
 
-    public void menuUserAdministrationChosen(){
-
-        System.out.println("What action do you want to perform?");
-    }
-
+//    @Override
+//    public void start(Stage primaryStage) throws Exception {
+//        this.cmdgui = new CMDGUI();
+//
+//        FXMLLoader loader = new FXMLLoader();
+////        loader.setLocation(AdminClient.class.getResource("GUI-Login.fxml"));
+//        Parent root = FXMLLoader.load(AdminClient.class.getResource("GUI-Menu.fxml"));
+//        Scene scene = new Scene(root);
+//        StringBuilder menuItems = new StringBuilder();
+//        for (MenuItem menuItem : cmdgui.getMenuItems()){
+//            menuItems.append(menuItem.getMenuName() + "\n");
+//        }
+//
+//        ButtonSubmitCommand.setOnAction(TextAreaOutput.setText(TextFieldCommand.getText()));
+//        this.LabelCommands.setText("test");
+//        this.LabelCommands.getText();
+//
+//
+////        this.label = new Label("Test");
+////        this.textField = new TextField("");
+////        this.submit = new Button("Submit");
+////        borderPane.setTop(this.label);
+////        borderPane.setCenter(this.textField);
+////        borderPane.setBottom(this.submit);
+//
+////        connect();
+//        primaryStage.setScene(scene);
+//        primaryStage.setTitle("Admininistration Application by Dave and Jan Kees");
+//        primaryStage.show();
+//    }
 }
